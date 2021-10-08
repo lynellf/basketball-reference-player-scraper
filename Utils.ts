@@ -1,4 +1,4 @@
-type Dict = Record<string, string | number>
+type Dict = Record<string, string | number | null>
 export const cellToKeyValPair = (output: Dict, cell: Element) => {
   const statHeader = cell.getAttribute('data-stat')
   const hasStatHeader = statHeader !== null
@@ -23,7 +23,7 @@ export const cellToKeyValPair = (output: Dict, cell: Element) => {
 }
 
 export const rowsToArray = (row: Element) => {
-  const cells = [...row.children]
+  const cells = Array.from(row.children)
   const seasonStats = cells.reduce(cellToKeyValPair, {})
 
   return seasonStats
@@ -39,7 +39,7 @@ export const trimWhitespace = (str: string) => {
 export function nameCheck(normalizedQuery: string) {
   function callback(playerItem: Element) {
     const playerName = playerItem.textContent
-    const normalizedPlayerName = playerName.toLowerCase()
+    const normalizedPlayerName = playerName?.toLowerCase() ?? ''
     const isMatch = normalizedPlayerName.includes(normalizedQuery)
 
     if (!isMatch) {

@@ -30,7 +30,7 @@ export const findPlayer = async (query: string) => {
   const searchQuery = `${BASE_URL}/players/${firstChar}`
   const document = await getDocument(searchQuery)
   const playerList = document.querySelectorAll(PLAYER_LIST_SELECTOR)
-  const playerArray = [...playerList]
+  const playerArray = Array.from(playerList)
   const matchedPlayer = playerArray.find(nameCheck(normalizedName))
   const hasMatch = matchedPlayer !== undefined
 

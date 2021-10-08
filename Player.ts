@@ -42,7 +42,7 @@ export const getPlayerStats = (document: Document, tableID: string) => {
     return null
   }
 
-  const tableChildren = [...table.children]
+  const tableChildren = Array.from(table.children)
   const tableBody = tableChildren.find((node) => node.tagName === 'TBODY')
   const hasTableBody = tableBody !== undefined
 
@@ -50,7 +50,7 @@ export const getPlayerStats = (document: Document, tableID: string) => {
     throw new Error('Table does not have a table body element')
   }
 
-  const tableRows = [...tableBody.children]
+  const tableRows = Array.from(tableBody.children)
   const stats = tableRows.map(rowsToArray)
 
   return stats
@@ -64,7 +64,7 @@ export const getPlayerContract = (document: Document) => {
     return null
   }
 
-  const tableChildren = [...contractTable.children]
+  const tableChildren = Array.from(contractTable.children)
   const tableBody = tableChildren.find((element) => element.tagName === 'TBODY')
   const tableHead = tableChildren.find((element) => element.tagName === 'THEAD')
   const hasTableBody = tableBody !== undefined
@@ -76,23 +76,25 @@ export const getPlayerContract = (document: Document) => {
   }
 
   const headerRow = tableHead.children[0]
-  const headerCells = [...headerRow.children]
-  const contractKeys = headerCells.map((cell) => cell.textContent)
+  const headerCells = Array.from(headerRow.children)
+  const contractKeys = headerCells.map(
+    (cell, index) => cell.textContent ?? `unknownCell_${index + 1}`
+  )
   const bodyRow = tableBody.children[0]
-  const bodyRowCells = [...bodyRow.children]
+  const bodyRowCells = Array.from(bodyRow.children)
   const results = bodyRowCells.reduce((output, cell, index) => {
     const key = contractKeys[index]
     output[key] = cell.textContent
 
     return output
-  }, {})
+  }, {} as Record<string, unknown>)
 
   return results
 }
 
 export const getPlayerAccolades = (document: Document) => {
   const accoladesList = document.querySelector('#bling')
-  const accoladesItems = [...accoladesList.children]
+  const accoladesItems = Array.from(accoladesList?.children ?? [])
   const accolades = accoladesItems.map((item) => item.textContent)
 
   return accolades
@@ -100,12 +102,12 @@ export const getPlayerAccolades = (document: Document) => {
 
 export const getPlayerAge = (str: string) => {
   const ageRegExp = /([0-9]+-[0-9]+d)/g
-  const age = str.match(ageRegExp)[0]
+  const age = str.match(ageRegExp)?.[0] ?? ''
   return age
 }
 
 export const getPlayerName = (document: Document) => {
-  return document.querySelector(PLAYER_NAME_SELECTOR).textContent
+  return document.querySelector(PLAYER_NAME_SELECTOR)?.textContent ?? ''
 }
 
 export const getPlayerBirthplace = (str: string) => {
@@ -192,9 +194,9 @@ export const getPlayerAttributes = (str: string) => {
   }
 
   const parsedAttributes = matchedStr[0]
-  const weight = parsedAttributes.match(weightRegExp)[0]
-  const height = parsedAttributes.match(heightRegExp)[0]
-  const handStr = parsedAttributes.match(handRegExp)[0]
+  const weight = parsedAttributes!.match(weightRegExp)![0]
+  const height = parsedAttributes!.match(heightRegExp)![0]
+  const handStr = parsedAttributes!.match(handRegExp)![0]
   const hand = handStr.split('Shoots: ')[1].trim()
 
   return { hand, height, weight }
@@ -206,7 +208,7 @@ export const getPlayerNicknames = (str: string) => {
   const nicknameStr = str.match(nicknameRegExp)
   const hasNickname = nicknameStr !== null
   const parsedNickname = hasNickname
-    ? nicknameStr[0].match(noParensRegExp).join('')
+    ? nicknameStr[0]!.match(noParensRegExp)!.join('')
     : ''
   const nicknameArr = hasNickname ? parsedNickname.split(',') : []
 
@@ -223,12 +225,15 @@ export const getPlayerDraft = (str: string) => {
     return null
   }
 
-  const splitStr = wasDrafted ? draftStr[0].split(',') : ''
+  const splitStr = wasDrafted ? draftStr[0].split(',') : []
   const draftClass = splitStr[3].trim()
   const draftYear = parseInt(draftClass, 0)
   const draftTeam = splitStr[0].split('Draft: ')[1].trim()
   const draftRound = parseInt(splitStr[1].trim(), 0)
-  const draftPos = parseInt(splitStr[1].match(draftPosRegExp)[0][1].trim(), 0)
+  const draftPos =
+    splitStr.length > 0
+      ? parseInt(splitStr[1]!.match(draftPosRegExp)![0][1].trim(), 0)
+      : ''
 
   return {
     team: draftTeam,
@@ -239,14 +244,14 @@ export const getPlayerDraft = (str: string) => {
 
 export const getPlayerBirthdate = (str: string) => {
   const dateRegExp = /([A-Z][a-z]+ +[0-9]+, +[0-9]+)/
-  const dateOfBirth = str.match(dateRegExp)[0]
+  const dateOfBirth = str.match(dateRegExp)?.[0] ?? ''
 
   return dateOfBirth
 }
 
 export const getPlayerBio = (document: Document) => {
   const bioElement = document.querySelector(BIO_SELECTOR)
-  const bioString = bioElement.textContent
+  const bioString = bioElement?.textContent ?? ''
   const trimmedBioString = trimWhitespace(bioString)
   const accolades = getPlayerAccolades(document)
   const age = getPlayerAge(trimmedBioString)
@@ -269,7 +274,8 @@ export const getPlayerBio = (document: Document) => {
     education,
     name,
     nicknames,
-    position
+    position,
+    dob
   }
 }
 
@@ -281,7 +287,7 @@ export const playerStatTableToObject = (tableIDs: string[]) => {
       return output
     }
     return [...output, id]
-  }, [])
+  }, [] as string[])
   return ids
 }
 
@@ -296,7 +302,7 @@ export const getPlayer = async (
   options: Options = { tableIDs: ['per_game'], bio: true, contract: false }
 ) => {
   const document = await findPlayer(query)
-  const results = options.tableIDs.reduce(
+  const results = (options?.tableIDs ?? []).reduce(
     (output, category) => {
       output[category] = getPlayerStats(document, category)
 
@@ -305,7 +311,7 @@ export const getPlayer = async (
     {
       bio: options.bio ? getPlayerBio(document) : null,
       contract: options.contract ? getPlayerContract(document) : null
-    }
+    } as Record<string, unknown>
   )
 
   return results
