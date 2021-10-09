@@ -2,10 +2,11 @@
   "name": "basketball-reference-player-scraper",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "/lib/src/index.js",
   "scripts": {
     "start": "ts-node mod.ts",
-    "test": "jest --detectOpenHandles"
+    "test": "jest",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "@types/jsdom": "^16.2.13",
     "@types/lodash": "^4.14.175",
     "@types/puppeteer": "^5.4.4",
+    "husky": "^7.0.2",
     "jest": "^27.2.4",
     "ts-jest": "^27.0.5"
   }
