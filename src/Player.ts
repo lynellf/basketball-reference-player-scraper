@@ -32,7 +32,7 @@ const VALID_TABLE_IDS = [
 ]
 
 export const getPlayerHonors = (document: Document) => {
-  const leaderboard = document.getElementById('div_leaderboard')
+  const leaderboard = document.getElementById(LEADERBOARD_SELECTOR)
   if (leaderboard) {
     const sections = Array.from(leaderboard.children)
     const tables = sections.map((section) => section.children[0])
