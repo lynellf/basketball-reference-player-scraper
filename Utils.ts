@@ -1,3 +1,7 @@
+import { readFileSync } from 'fs'
+
+export const getFile = (filename: string) => `${readFileSync(filename)}`
+
 type Dict = Record<string, string | number | null>
 export const cellToKeyValPair = (output: Dict, cell: Element) => {
   const statHeader = cell.getAttribute('data-stat')
