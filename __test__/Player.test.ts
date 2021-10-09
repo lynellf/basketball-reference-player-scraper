@@ -1,11 +1,11 @@
-import { getPlayerBio, getPlayerHonors } from './Player'
-import { getWindow } from './Puppet'
-import { getFile } from './Utils'
+import { getPlayerBio, getPlayerHonors } from '../src/Player'
+import { getWindow } from '../src/Puppet'
+import { getFile } from '../src/Utils'
 import { isEqual } from 'lodash'
 
 describe('player profile', () => {
   test("Carmelo Anthony's Education", () => {
-    const html = getFile('./carmelo-anthony.html')
+    const html = getFile('./__test__/carmelo-anthony.html')
     const { document } = getWindow(html)
     const {
       education: { college, highSchool }
@@ -20,7 +20,7 @@ describe('player profile', () => {
   })
 
   test("Michael Jordan's education", () => {
-    const html = getFile('./michael-jordan.html')
+    const html = getFile('./__test__/michael-jordan.html')
     const { document } = getWindow(html)
     const {
       education: { highSchool, college }
@@ -35,7 +35,7 @@ describe('player profile', () => {
   })
 
   test("Luka Doncic's education", () => {
-    const html = getFile('./luka-doncic.html')
+    const html = getFile('./__test__/luka-doncic.html')
     const { document } = getWindow(html)
     const {
       education: { highSchool, college }
@@ -48,7 +48,7 @@ describe('player profile', () => {
   })
 
   test("Lebron James' education", () => {
-    const html = getFile('./lebron-james.html')
+    const html = getFile('./__test__/lebron-james.html')
     const { document } = getWindow(html)
     const {
       education: { college, highSchool }
@@ -63,7 +63,7 @@ describe('player profile', () => {
   })
 
   test("Carmelo Anthony's honors", () => {
-    const html = getFile('./carmelo-anthony.html')
+    const html = getFile('./__test__/carmelo-anthony.html')
     const { document } = getWindow(html)
     const honors = getPlayerHonors(document)
     const hasFourtyHonors = honors.length === 40

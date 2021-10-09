@@ -1,14 +1,25 @@
 {
   "name": "basketball-reference-player-scraper",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "1.1.0",
+  "description": "A simple web scraper for NBA player data via Basketball-Reference",
+  "main": "/lib/src/index.js",
   "scripts": {
     "start": "ts-node mod.ts",
-    "test": "jest --detectOpenHandles"
+    "test": "jest",
+    "build": "tsc"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "basketball-reference",
+    "nba",
+    "nba stats"
+  ],
+  "homepage": "https://github.com/lynellf/basketball-reference-player-scraper",
+  "bugs": "https://github.com/lynellf/basketball-reference-player-scraper/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lynellf/basketball-reference-player-scraper"
+  },
+  "author": "Ezell Frazier",
   "license": "ISC",
   "dependencies": {
     "jsdom": "^17.0.0",
@@ -22,6 +33,7 @@
     "@types/jsdom": "^16.2.13",
     "@types/lodash": "^4.14.175",
     "@types/puppeteer": "^5.4.4",
+    "husky": "^7.0.2",
     "jest": "^27.2.4",
     "ts-jest": "^27.0.5"
   }
