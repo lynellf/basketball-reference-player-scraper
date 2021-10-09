@@ -1,100 +1,72 @@
-import { getPlayerBio } from './Player'
+import { getPlayerBio, getPlayerHonors } from './Player'
 import { getWindow } from './Puppet'
 import { getFile } from './Utils'
 import { isEqual } from 'lodash'
 
 describe('player profile', () => {
-  test("Syracuse is Carmelo Anthony's college", () => {
+  test("Carmelo Anthony's Education", () => {
     const html = getFile('./carmelo-anthony.html')
     const { document } = getWindow(html)
     const {
-      education: { college }
+      education: { college, highSchool }
     } = getPlayerBio(document)
     const collegeMatch = isEqual(college, ['Syracuse'])
-    expect(collegeMatch).toBeTruthy()
-  })
-
-  test("Townson Cathloic and Oak Hill Academy are Carmelo Anthony's high scools", () => {
-    const html = getFile('./carmelo-anthony.html')
-    const { document } = getWindow(html)
-    const {
-      education: { highSchool }
-    } = getPlayerBio(document)
-
     const hsMatch = isEqual(highSchool, [
       'Towson Catholic in Towson, Maryland',
       'Oak Hill Academy in Mouth of Wilson, Virginia'
     ])
     expect(hsMatch).toBeTruthy()
+    expect(collegeMatch).toBeTruthy()
   })
 
-  test("Emsly A. Laney is Michael Jordan's High School", () => {
+  test("Michael Jordan's education", () => {
     const html = getFile('./michael-jordan.html')
     const { document } = getWindow(html)
     const {
-      education: { highSchool }
+      education: { highSchool, college }
     } = getPlayerBio(document)
 
     const hsMatch = isEqual(highSchool, [
       'Emsley A. Laney in Wilmington, North Carolina'
     ])
+    const collegeMatch = isEqual(college, ['UNC'])
     expect(hsMatch).toBeTruthy()
+    expect(collegeMatch).toBeTruthy()
   })
 
-  test("UNC is Michael Jordan's College", () => {
-    const html = getFile('./michael-jordan.html')
-    const { document } = getWindow(html)
-    const {
-      education: { college }
-    } = getPlayerBio(document)
-
-    const hsMatch = isEqual(college, ['UNC'])
-    expect(hsMatch).toBeTruthy()
-  })
-
-  test('Luka Doncic has no college on record', () => {
+  test("Luka Doncic's education", () => {
     const html = getFile('./luka-doncic.html')
     const { document } = getWindow(html)
     const {
-      education: { college }
-    } = getPlayerBio(document)
-
-    const hsMatch = isEqual(college, null)
-    expect(hsMatch).toBeTruthy()
-  })
-
-  test('Luka Doncic has no high school on record', () => {
-    const html = getFile('./luka-doncic.html')
-    const { document } = getWindow(html)
-    const {
-      education: { highSchool }
+      education: { highSchool, college }
     } = getPlayerBio(document)
 
     const hsMatch = isEqual(highSchool, null)
+    const collegeMatch = isEqual(college, null)
     expect(hsMatch).toBeTruthy()
+    expect(collegeMatch).toBeTruthy()
   })
 
-  test('Lebron James has no college on record', () => {
+  test("Lebron James' education", () => {
     const html = getFile('./lebron-james.html')
     const { document } = getWindow(html)
     const {
-      education: { college }
+      education: { college, highSchool }
     } = getPlayerBio(document)
 
-    const hsMatch = isEqual(college, null)
-    expect(hsMatch).toBeTruthy()
-  })
-
-  test("Saint Vincent-Saint Mary is Lebron James's high school", () => {
-    const html = getFile('./lebron-james.html')
-    const { document } = getWindow(html)
-    const {
-      education: { highSchool }
-    } = getPlayerBio(document)
-
+    const collegeMatch = isEqual(college, null)
     const hsMatch = isEqual(highSchool, [
       'Saint Vincent-Saint Mary in Akron, Ohio'
     ])
     expect(hsMatch).toBeTruthy()
+    expect(collegeMatch).toBeTruthy()
+  })
+
+  test("Carmelo Anthony's honors", () => {
+    const html = getFile('./carmelo-anthony.html')
+    const { document } = getWindow(html)
+    const honors = getPlayerHonors(document)
+    const hasFourtyHonors = honors.length === 40
+    expect(hasFourtyHonors).toBeTruthy()
   })
 })
