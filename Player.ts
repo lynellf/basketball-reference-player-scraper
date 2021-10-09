@@ -134,10 +134,48 @@ export const getPlayerBirthplace = (str: string) => {
 }
 
 export const getPlayerHighSchool = (str: string) => {
-  const highSchoolRegExp = /(?=High School:)(.*)(?=Recruiting Rank)/
-  const altHighSchoolRegExp = /(?=High School:)(.*)(?=Draft:)/
+  const regExps = [
+    /(?=High School:)(.*)(?=Recruiting Rank)/,
+    /(?=High School:)(.*)(?=Draft:)/,
+    /(?=High Schools:)(.*)(?=Recruiting Rank:)/,
+    /(?=High Schools:)(.*)(?=Draft:)/
+  ]
+
   const matchedString =
-    str.match(highSchoolRegExp) || str.match(altHighSchoolRegExp)
+    regExps
+      .map((regExp) => str.match(regExp))
+      .find((match) => match !== null) ?? []
+  const hasMatch = matchedString.length > 0
+
+  if (!hasMatch) {
+    return null
+  }
+
+  const matches = matchedString[0]
+  const strsToSplitby = ['High School: ', 'High Schools: ']
+  const highSchool = strsToSplitby.map((str) => matches.split(str)[1])
+  const results = highSchool?.[1]
+    ?.split(',')
+    ?.reduce((output, str, index, input) => {
+      const isOdd = index % 2 === 1
+      const prevVal = input[index - 1]
+      const canJoin = isOdd
+      if (canJoin) {
+        output[index - 1] = `${prevVal},${str}`.trim()
+        return output
+      }
+
+      return output
+    }, [] as string[])
+    .filter((val) => val) ?? [highSchool[0].trim()]
+  return results
+}
+
+// why? some players have a slightly different description
+// thus, we need a slightly different regular expression
+export const altGetPlayerCollege = (str: string) => {
+  const collegeRegExp = /(?=College:)(.*)(?=High Schools:)/
+  const matchedString = str.match(collegeRegExp)
   const hasMatch = matchedString !== null
 
   if (!hasMatch) {
@@ -145,9 +183,9 @@ export const getPlayerHighSchool = (str: string) => {
   }
 
   const matches = matchedString[0]
-  const highSchool = matches.split('High School: ')[1]
+  const college = matches.split('College: ')[1]
 
-  return highSchool
+  return [college.trim()]
 }
 
 export const getPlayerCollege = (str: string) => {
@@ -162,7 +200,7 @@ export const getPlayerCollege = (str: string) => {
   const matches = matchedString[0]
   const college = matches.split('College: ')[1]
 
-  return college.trim()
+  return [college.trim()]
 }
 
 export const getPlayerPosition = (str: string) => {
@@ -258,7 +296,8 @@ export const getPlayerBio = (document: Document) => {
   const name = getPlayerName(document)
   const birthplace = getPlayerBirthplace(trimmedBioString)
   const highSchool = getPlayerHighSchool(trimmedBioString)
-  const college = getPlayerCollege(trimmedBioString)
+  const college =
+    getPlayerCollege(trimmedBioString) || altGetPlayerCollege(trimmedBioString)
   const position = getPlayerPosition(trimmedBioString)
   const attributes = getPlayerAttributes(trimmedBioString)
   const nicknames = getPlayerNicknames(bioString)
