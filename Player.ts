@@ -6,6 +6,7 @@ const BASE_URL = 'https://www.basketball-reference.com/'
 const CONTRACT_SELECTOR = 'table[id^="contracts_"]'
 const BIO_SELECTOR = 'div[itemtype="https://schema.org/Person"]'
 const PLAYER_NAME_SELECTOR = 'h1[itemprop="name"]'
+const LEADERBOARD_SELECTOR = 'div_leaderboard'
 const VALID_TABLE_IDS = [
   'advanced',
   'all_college_stats',
@@ -29,6 +30,28 @@ const VALID_TABLE_IDS = [
   'year-and-career-highs-po',
   'year-and-career-highs'
 ]
+
+export const getPlayerHonors = (document: Document) => {
+  const leaderboard = document.getElementById('div_leaderboard')
+  if (leaderboard) {
+    const sections = Array.from(leaderboard.children)
+    const tables = sections.map((section) => section.children[0])
+    const honors = tables.map((table) => {
+      const children = Array.from(table.children)
+      const label = children![0].textContent!.trim()
+      const results = Array.from(children[1].children).map((row) => {
+        const nodes = row.children[0].childNodes
+        const honor = nodes![0].textContent!.trim()
+        const rank = nodes[nodes.length - 1]?.textContent?.trim() ?? -1
+        return { honor, rank }
+      })
+      return { label, results }
+    })
+    return honors
+  }
+
+  return []
+}
 
 export const getPlayerPage = async (query: string) => {
   return await getDocument(`${BASE_URL}/players/${query}`)
@@ -334,24 +357,30 @@ type Options = {
   tableIDs?: string[]
   bio?: boolean
   contract?: boolean
+  honors?: boolean
 }
 
 export const getPlayer = async (
   query: string,
-  options: Options = { tableIDs: ['per_game'], bio: true, contract: false }
+  options: Options = {
+    tableIDs: ['per_game'],
+    bio: true,
+    contract: false,
+    honors: true
+  }
 ) => {
   const document = await findPlayer(query)
-  const results = (options?.tableIDs ?? []).reduce(
-    (output, category) => {
-      output[category] = getPlayerStats(document, category)
 
-      return output
-    },
-    {
-      bio: options.bio ? getPlayerBio(document) : null,
-      contract: options.contract ? getPlayerContract(document) : null
-    } as Record<string, unknown>
-  )
+  const baseOutput = {
+    bio: options.bio ? getPlayerBio(document) : null,
+    contract: options.contract ? getPlayerContract(document) : null,
+    honors: getPlayerHonors(document)
+  } as Record<string, unknown>
+
+  const results = (options?.tableIDs ?? []).reduce((output, category) => {
+    output[category] = getPlayerStats(document, category)
+    return output
+  }, baseOutput)
 
   return results
 }
