@@ -9,10 +9,11 @@ export function getWindow(htmlString: string) {
 }
 
 export async function getHTMLFromChrome(url: string) {
-  const init = await puppeteer.launch()
-  const puppet = await init.newPage()
+  const browser = await puppeteer.launch()
+  const puppet = await browser.newPage()
   await puppet.goto(url)
   const htmlString = await puppet.content()
+  await browser.close()
   return htmlString
 }
 
